@@ -127,11 +127,11 @@ public void WriteFile(AbsoluteFilename filename)
 
 ## Roadmap
 
-This release represents the stable 1.0 version and will use semantic versioning. If there is enough interest,
+This release represents the stable 1.0 version and will use semantic versioning.
 
 This library was developed for use in a Windows Forms Desktop environment using the .NET Framework 4. It should in theory work on all Windows systems and an all Framworks > 4, but it may need some changes to work with the new .NET Core.
 
-I would consider adding posix path support for the 2.0 version including conversion between windows paths, posix paths and maybe urls.
+If there is enough interest, I would consider adding posix path support for the 2.0 version including conversion between windows paths, posix paths and maybe urls.
 
 Pull requests for Features or bugfixes are always welcome!
 
