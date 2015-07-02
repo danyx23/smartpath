@@ -9,3 +9,4 @@ SmartPath/HTS.SmartPath.1.0.0.0.nupkg
 SmartPathTests/obj/
 SmartPathTests/bin/
 *.nupkg
+SmartPath/packages/
