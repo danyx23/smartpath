@@ -1,0 +1,10 @@
+Cocorbase/
+Data/
+DataTest/
+SmartPath/obj/
+ThirdPartyLibraries/
+Utils/
+XmlSerializerHelpers/
+SmartPath/HTS.SmartPath.1.0.0.0.nupkg
+SmartPathTests/obj/
+SmartPathTests/bin/
