@@ -6,7 +6,7 @@ I use it everywhere you would normally use a string to store filenames or direct
 there are different types for absolute filenames, absolute directories, relative filenames and 
 relative directories it minimizes mistakes when working with paths.
 
-To use the SmartPath library, install it via [NuGet](https://www.nuget.org/packages/smartpath/) or build it yourself from the [github repository](https://github.com/danyx23/smartpath).
+To use the SmartPath library, install it via [NuGet](https://www.nuget.org/packages/HTS.SmartPath/) or build it yourself from the [github repository](https://github.com/danyx23/smartpath).
 
 I always like to get a quick look at how to use the library, so here is a typical example:
 
