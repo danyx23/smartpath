@@ -1,0 +1,747 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HTS.SmartPath</name>
+    </assembly>
+    <members>
+        <member name="T:HTS.SmartPath.AbsoluteDirectory">
+            <summary>
+            	Represents an absolute filesystem directory path. Valid paths are
+            	windows NTFS paths starting with a drive letter (C:\test\) or SMB Shares
+            	(\\Server\share\somedir). Whenever an AbsoluteDirectory is converted
+            	back into a string, a backslash character will be appended to distinguish
+            	it from filenames
+            </summary>
+        </member>
+        <member name="F:HTS.SmartPath.AbsoluteDirectory.Empty">
+            <summary>
+            	Default value for this type that represents no directory.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.DirectoryInfo">
+            <summary>
+            	Gets a <see cref="T:System.IO.DirectoryInfo"/>.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.AbsoluteParent">
+            <summary>
+            	Gets the parent directory or Empty if this is a root directory.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.AbsolutePath">
+            <summary>
+            	This absolute path as a string or the empty string if this is the Empty path.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.DirectoryName">
+            <summary>
+            	The name of this directory, without any parent directories or sepration characters. Empty string if this is the Empty path.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.IsRoot">
+            <summary>
+            	Tells if this directory is a root directory
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.IsEmpty">
+            <summary>
+            	Indicates if the path is Empty
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.IsValid">
+            <summary>
+            	Flag that indicates if this path is valid. At the moment this simply means if it is not empty,
+            	as all invalid characters etc would already be rejected by the contsturctor.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.#ctor(System.String)">
+            <summary>
+            	Initializing Contstructor. Takes a string and creates an absolute directory from it.
+            	Attention: throws an exception if the path is invalid.		
+            </summary>
+            <param name="absolutePath">The path to turn into an AbsoluteDirectory. Has to be rooted.</param>
+            <exception cref="T:HTS.SmartPath.PathInvalidException">Thrown when the given path string is empty or does not conform to our path regex</exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.FromAbsolutePath(System.String,System.Boolean)">
+            <summary>
+            	Returns an AbsoluteDirectory representing the given path or the Empty element if either
+            	the string is empty or null or if it contained illegal characters (=did not match
+            	the Regex). Doesn't care if the directory actually exists or not.
+            </summary>
+            <param name="absolutePath">The path to create from. Should not be null and should be a rooted path.</param>
+            <param name="throwExceptionOnInvalidPath">Flag to indicate if an exception should be thrown if the path was invalid.</param>
+            <returns>An AbsoluteDirectory representing the given path or the Empty element.</returns>
+            <exception cref="T:HTS.SmartPath.PathInvalidException">Thrown if the parameter throwExceptionOnInvalidPath is true.</exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.FromAbsoluteOrRelativePath(System.String,HTS.SmartPath.AbsoluteDirectory)">
+            <summary>
+            	Returns an AbsoluteDirectory representing the given path if it is an absolute path,
+            	or, if the path is relative, returns the relative path appended to the given workingdirectory.
+            </summary>
+            <param name="path">The path to create from. Should not be null.</param>
+            <param name="workingDirectory">The working directory to use as a base if path is a relative directory.</param>
+            <returns>A AbsoluteDirectory representing the given path or Empty if the path was invalid.</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.Exists">
+            <summary>
+            	Checks if the directory actually exists on the filesystem.
+            </summary>
+            <returns>True if the directory exists.</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.CreateFilename(System.String)">
+            <summary>
+            	Creates an absolutefilename under this directory. 
+            </summary>
+            <param name="relativeFilePath">The name of the file to create an AbsoluteFilename path for under this directory path. 
+            The filename can have optional directories preceding it and separated by \.  An Exception is thrown if this parameter is null
+            or invalid.
+            </param>
+            <returns>The new AbsoluteFilename.</returns>
+            <exception cref="!:ArgumentNullExcpetion"></exception>
+            <exception cref="T:HTS.SmartPath.PathInvalidException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.CreateFilename(HTS.SmartPath.RelativeFilename)">
+            <summary>
+            	Creates an AbsoluteFilename under this directory. 
+            </summary>
+            <param name="filename">The name of the file to create an AbsoluteFilename path for under this directory path. 
+            The filename can have optional directories preceding it and separated by \. An Exception is thrown if this parameter is Empty.
+            </param>
+            <returns>The new AbsoluteFilename.</returns>
+            <exception cref="!:ArgumentNullExcpetion"></exception>
+            <exception cref="T:HTS.SmartPath.PathInvalidException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.CreateDirectoryPath(System.String)">
+            <summary>
+            	Creates an AbsoluteDirectory under this directory. 
+            </summary>
+            <param name="directoryname">The name of the directory to create an AbsoluteDirectory path for under this directory path. 
+            The directory can have optional directories preceding it and separated by \.  An Exception is thrown if this parameter is null or empty
+            or invalid.
+            </param>
+            <returns>The new AbsoluteDirectory.</returns>
+            <exception cref="T:HTS.SmartPath.PathInvalidException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.CreateDirectoryPath(HTS.SmartPath.RelativeDirectory)">
+            <summary>
+            	Creates an AbsoluteDirectory under this directory. 
+            </summary>
+            <param name="directoryname">The name of the directory to create an AbsoluteDirectory path for under this directory path. 
+            The directory can have optional directories preceding it and separated by \.  An Exception is thrown if this parameter is Empty.
+            </param>
+            <returns>The new AbsoluteDirectory.</returns>
+            <exception cref="T:HTS.SmartPath.PathInvalidException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.TryCreateFilename(System.String,HTS.SmartPath.AbsoluteFilename@)">
+            <summary>
+            	Tries to create a filename under the current directory, returns false if the filename was invalid.
+            </summary>
+            <param name="filename">The name of the file to create an AbsoluteFilename path for under this directory path. 
+            The filename can have optional directories preceding it and separated by \ </param>
+            <param name="result">The new AbsoluteFilename.</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.TryCreateFilename(HTS.SmartPath.RelativeFilename,HTS.SmartPath.AbsoluteFilename@)">
+            <summary>
+            	Tries to create an AbsoluteFilename under the current directory, returns false if the filename was invalid.
+            </summary>
+            <param name="filename">The name of the file to create an AbsoluteFilename path for under this directory path. </param>
+            <param name="result">The new AbsoluteFilename.</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.TryCreateDirectoryPath(System.String,HTS.SmartPath.AbsoluteDirectory@)">
+            <summary>
+            	Tries to create an AbsoluteDirectory under the current directory, returns false if the directoryname was invalid.
+            </summary>
+            <param name="filename">The name of the directory to create an AbsoluteFilename path for under this directory path. 
+            The filename can have optional directories preceding it and separated by \. </param>
+            <param name="result">The new AbsoluteFilename.</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.TryCreateDirectoryPath(HTS.SmartPath.RelativeDirectory,HTS.SmartPath.AbsoluteDirectory@)">
+            <summary>
+            	Tries to create an AbsoluteDirectory under the current directory, returns false if the directoryname was invalid.
+            </summary>
+            <param name="filename">The name of the directory to create an AbsoluteFilename path for under this directory path. 
+            The filename can have optional directories preceding it and separated by \. </param>
+            <param name="result">The new AbsoluteFilename.</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.CreateFileSystemDirectory">
+            <summary>
+            	Creates this directory on the actual filesystem.
+            </summary>
+            <returns>this, for chaining calls.</returns>
+            <exception cref="!:System.IO.IOExeption"></exception>
+            <exception cref="!:System.UnauthorizedExcpetion"></exception>
+            <exception cref="T:System.IO.PathTooLongException"></exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.DeleteFilesystemItemIfExists">
+            <summary>
+            	Delete this directory on the actual filesystem if it exists
+            </summary>
+            <exception cref="!:System.IO.IOExeption"></exception>
+            <exception cref="!:System.UnauthorizedExcpetion"></exception>
+            <exception cref="T:System.IO.PathTooLongException"></exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.GetFileSystemFiles(HTS.SmartPath.FileExtension,System.Boolean)">
+            <summary>
+            	Enumerates all files matching a given file extension inside this directory (and optionally inside all subdirectories).
+            </summary>
+            <remarks>The implementation is lazy using Directory.EnumerateFiles()</remarks>
+            <param name="filter">The file Extension to filter for, may not be null.</param>
+            <param name="searchInSubdirectories"></param>
+            <returns>The AbsoluteFilenames of the files that were found</returns>
+            <exception cref="T:System.ArgumentException">filter was invalid.</exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+            <exception cref="T:System.IO.IOException"></exception>
+            <exception cref="T:System.IO.PathTooLongException"></exception>
+            <exception cref="T:System.Security.SecurityException"></exception>
+            <exception cref="T:System.UnauthorizedAccessException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.GetFileSystemFiles(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            	Enumerates all files matching a given file extension inside this directory (and optionally inside all subdirectories).
+            </summary>
+            <remarks>The implementation is lazy using Directory.EnumerateFiles()</remarks>
+            <param name="filter">The file Extension to filter for, may not be null.</param>
+            <param name="searchInSubdirectories">Flag to indicate if subdirectories should be searched.</param>
+            <param name="workaround3CharactersSpecialCase">The underlying .NET methods have a weird special case for 3 character long file extensions that ends up
+            returning all files matching longer file extensions as well (so a search for *.txt will match some.txtsomething). If this flag is set to true it will
+            filter out filenames with longer extensions.</param>
+            <returns>The AbsoluteFilenames of the files that were found</returns>
+            <exception cref="T:System.ArgumentException">filter was invalid.</exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+            <exception cref="T:System.IO.IOException"></exception>
+            <exception cref="T:System.IO.PathTooLongException"></exception>
+            <exception cref="T:System.Security.SecurityException"></exception>
+            <exception cref="T:System.UnauthorizedAccessException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.GetFileSystemDirectories">
+            <summary>
+            	Enumerates all directories matching a given file extension inside this directory (and optionally inside all subdirectories).
+            </summary>
+            <remarks>The implementation is lazy using Directory.EnumerateDirectories()</remarks>
+            <returns>The AbsoluteFilenames of the files that were found</returns>
+            <exception cref="T:System.ArgumentException">filter was invalid.</exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+            <exception cref="T:System.IO.IOException"></exception>
+            <exception cref="T:System.IO.PathTooLongException"></exception>
+            <exception cref="T:System.Security.SecurityException"></exception>
+            <exception cref="T:System.UnauthorizedAccessException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.TryGetRelativePath(HTS.SmartPath.AbsoluteDirectory,HTS.SmartPath.RelativeDirectory@)">
+            <summary>
+            		Returns (as an out parameter) the RelativeDirectory to get from the given base directory to this directory. Returns false if the two paths have 
+            		no common root, otherwise true. If the base directory is identical with this directory, the relativeDirectoryResult is the Empty value.
+            </summary>
+            <param name="baseDirectory">Base directory to get the relative path from. Must not be null.</param>
+            <param name="relativeDirectoryResult">The relativeDirectory that represents the path from the baseDirectory to this directory.</param>
+            <returns>True if the two paths have a common root directory, otherwise false</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.GetRelativePathOrNull(HTS.SmartPath.AbsoluteDirectory)">
+            <summary>
+            	Returns the RelativeDirectory to get from the given base directory to this directory. Returns null if the two paths have 
+            	no common root or <see cref="F:HTS.SmartPath.RelativeDirectory.Empty"/> if the base directory is identical with this directory.
+            </summary>
+            <param name="baseDirectory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.Equals(HTS.SmartPath.AbsoluteDirectory)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.ToString">
+            <summary>
+            Returns the absolute path of this instance
+            </summary>
+            <returns>
+            The absolute path.
+            </returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.op_Addition(HTS.SmartPath.AbsoluteDirectory,HTS.SmartPath.RelativeDirectory)">
+            <summary>
+            	Combines an AbsoluteDirectory with a RelativeDirectory. BaseDir may not be Empty.
+            </summary>
+            <param name="baseDir"></param>
+            <param name="relDir"></param>
+            <returns>The combined AbsoluteDirectory</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteDirectory.op_Addition(HTS.SmartPath.AbsoluteDirectory,HTS.SmartPath.RelativeFilename)">
+            <summary>
+            	Combines an AbsoluteDirectory with a RelativeFilename. BaseDir may not be Empty.
+            </summary>
+            <param name="baseDir"></param>
+            <param name="relDir"></param>
+            <returns>The combined AbsoluteFilename</returns>
+        </member>
+        <member name="T:HTS.SmartPath.AbsoluteFilename">
+            <summary>
+            	Represents an absolute filename path. Valid paths are
+            	windows NTFS paths starting with a drive letter (C:\test\) or SMB Shares
+            	(\\Server\share\somedir). 
+            </summary>
+        </member>
+        <member name="F:HTS.SmartPath.AbsoluteFilename.Empty">
+            <summary>
+            	Default value for this type that represents no filename.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.FileInfo">
+            <summary>
+            	The <see cref="T:System.IO.FileInfo"/> for this file. Lazily initialized.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.FilenameWithExtension">
+            <summary>
+            	Filename including the file extension or an empty string if this is an Empty value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.AbsoluteParent">
+            <summary>
+            	The parent <see cref="T:HTS.SmartPath.AbsoluteDirectory"/>.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.AbsolutePath">
+            <summary>
+            	The absolute path as a string or an empty string if this element is an Emtpy value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.Extension">
+            <summary>
+            	The file extions of this file or the Empty FileExtension value if the file does not have an extension.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.IsEmpty">
+            <summary>
+            	Indicates if the path is Empty
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.IsValid">
+            <summary>
+            	Flag that indicates if this path is valid. At the moment this simply means if it is not empty,
+            	as all invalid characters etc would already be rejected by the contsturctor.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.FileNameWithoutExtension">
+            <summary>
+            	The filename without the file extension (and without the dot of course).
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.FromAbsolutePath(System.String,System.Boolean)">
+            <summary>
+            	Returns an AbsoluteFilename representing the given path or the Empty value if either
+            	the string is empty or null or if it contained illegal characters (=did not match
+            	the FullPathRegex). Doesn't care if the file actually exists or not. 
+            </summary>
+            <param name="absolutePath">The path to create the AbsoluteFilename from.</param>
+            <param name="throwExceptionForInvalidPath">Flag to indicate if an exception should be thrown (or null returned) if the given path was invalid.</param>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.WithChangedExtension(HTS.SmartPath.FileExtension)">
+            <summary>
+            	Returns a new AbsoluteFilename with the given file extension. If the file extension is invalid, 
+            	the unchanged instance is returned.
+            </summary>
+            <param name="extension">Extension to change the file to.</param>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.Exists">
+            <summary>
+            	Checks if a file with this name actually exists in the filesystem.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.DeleteFilesystemItemIfExists">
+            <summary>
+            	Deletes the file if it exists.
+            </summary>
+            <exception cref="!:System.IO.IOExeption"></exception>
+            <exception cref="!:System.UnauthorizedExcpetion"></exception>
+            <exception cref="T:System.IO.PathTooLongException"></exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.AsRelativeFilename">
+            <summary>
+            	Returns just the filename (without any of the directories) as a <see cref="T:HTS.SmartPath.RelativeFilename"/>, or the
+            	RelativeFilename.Empty value if this instance is the empty value.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.TryGetRelativePath(HTS.SmartPath.AbsoluteDirectory,HTS.SmartPath.RelativeFilename@)">
+            <summary>
+            	Returns, as an out parameter, the <see cref="T:HTS.SmartPath.RelativeFilename"/> relative to the given base directory. If this filename and the 
+            	given baseDirectory do not share a common root, false is returned.
+            </summary>
+            <param name="baseDirectory"></param>
+            <returns>False if the this file does not share the root directory with the given baseDirectory.</returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.GetRelativePathOrNull(HTS.SmartPath.AbsoluteDirectory)">
+            <summary>
+            	Returns the <see cref="T:HTS.SmartPath.RelativeFilename"/> relative to the given base directory. If this filename and the 
+            	given baseDirectory do not share a common root, null is returned.
+            </summary>
+            <param name="baseDirectory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.Equals(HTS.SmartPath.AbsoluteFilename)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:HTS.SmartPath.AbsoluteFilename.ToString">
+            <summary>
+            Returns the absolute path as a string.
+            </summary>
+            <returns>
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="T:HTS.SmartPath.FileExtension">
+            <summary>
+            	Represents a file extension, i.e. the part after the last dot in a filename. It is basically just a wrapper
+            	around a string but provides type safety and convenience properties to handle getting a string including 
+            	and excluding the dot
+            </summary>
+        </member>
+        <member name="F:HTS.SmartPath.FileExtension.Empty">
+            <summary>
+            	Default value for this type that represents no fileextension.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.FileExtension.#ctor(System.String)">
+            <summary>
+            	Constructor that constructs from a file extension string (without the leading dot)
+            </summary>
+            <param name="extensionWithoutDot"></param>
+            <exception cref="T:HTS.SmartPath.PathInvalidException">The extension started with a dot.</exception>
+        </member>
+        <member name="P:HTS.SmartPath.FileExtension.AsStringWithDot">
+            <summary>
+            	The extension as a string with the leading dot.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.FileExtension.AsStringWithoutDot">
+            <summary>
+            	The extension as a string without the leading dot.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.FileExtension.IsEmpty">
+            <summary>
+            	Indicates if the file extension is Empty
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.FileExtension.IsValid">
+            <summary>
+            	Flag that indicates if this file extension is valid. At the moment this simply means if it is not empty,
+            	as all invalid characters etc would already be rejected by the contsturctor.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.FileExtension.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.FileExtension.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.FileExtension.Equals(HTS.SmartPath.FileExtension)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:HTS.SmartPath.FileExtension.ToString">
+            <summary>
+            Returns the extension as a string.
+            </summary>
+            <returns>
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="T:HTS.SmartPath.PathInvalidException">
+            <summary>
+            	Exception that indicates that a path was invalid (e.g. because it contained illegal characters).
+            </summary>
+        </member>
+        <member name="T:HTS.SmartPath.RelativeDirectory">
+            <summary>
+            	Represents a relative directory (one that doesn't have a root), e.g. "some directory". Has properties
+            	to express the parent directory ("..") or the empty directory (useful as a result if
+            	one attempts to get the relative path from one dir to another when they are the same)
+            </summary>
+        </member>
+        <member name="F:HTS.SmartPath.RelativeDirectory.Empty">
+            <summary>
+            	Represents an empty directory (useful as a result for getting relative paths if they are identical).
+            </summary>
+        </member>
+        <member name="F:HTS.SmartPath.RelativeDirectory.UpOneDirectory">
+            <summary>
+            	Represenst the parent directory in paths ("..")
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeDirectory.DirectoryName">
+            <summary>
+            	The name of this directory, without any separation characters or an empty string if it is the Empty value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeDirectory.Parent">
+            <summary>
+            	The ParentDirectory of this Element or the Empty value if no parent directory was specified.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeDirectory.IsEmpty">
+            <summary>
+            	Indicates if the path is Empty
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeDirectory.FullPath">
+            <summary>
+            	The full path of this relative directory (i.e. with the relative directories
+            	that were included in the construction or that it was constructed from), or
+            	an empty string for the Empty value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeDirectory.IsValid">
+            <summary>
+            	Flag that indicates if this path is valid. At the moment this simply means if it is not empty,
+            	as all invalid characters etc would already be rejected by the contsturctor.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.CreateDirectoryPath(System.String)">
+            <summary>
+            	Creates a new RelativeDirectory below this one.
+            </summary>
+            <param name="directoryName">Name of the new directory.</param>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.CreateFilename(System.String)">
+            <summary>
+            	Creates a new RelativeFilename below this directory.
+            </summary>
+            <param name="filename"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.FromPathString(System.String,System.Boolean)">
+            <summary>
+            	Creates a RelativeDirectory from a string. 
+            </summary>
+            <param name="relativePath"></param>
+            <param name="throwExceptionForInvalidPaths"></param>
+            <returns>The new RelativeDirectory or null if the string was invalid.</returns>
+            <exception cref="T:HTS.SmartPath.PathInvalidException">Thrown if the parameter throwExceptionForInvalidPaths is true and the path is invalid.</exception>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.Equals(HTS.SmartPath.RelativeDirectory)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeDirectory.ToString">
+            <summary>
+            Returns the fully qualified type name of this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> containing a fully qualified type name.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="T:HTS.SmartPath.RelativeFilename">
+            <summary>
+            	Represents a relative filename (one that doesn't have a root), e.g. "filename.txt". Can also
+            	include relative parent directories (e.g. "somedir\filename.txt") or even parent directory
+            	specifiers (e.g. "..\filename.txt")
+            </summary>
+        </member>
+        <member name="F:HTS.SmartPath.RelativeFilename.Empty">
+            <summary>
+            	Default value for this type that represents no filename.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.FilenameWithExtension">
+            <summary>
+            	The filename including the file extension or an empty string for the Empty value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.FilenameWithoutExtension">
+            <summary>
+            	The filename without the file extension or the empty string for the Empty value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.FullPath">
+            <summary>
+            	The full path of this relative Filename (i.e. with the relative directories
+            	that were included in the construction or that it was constructed from), or
+            	an empty string for the Empty value.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.Extension">
+            <summary>
+            	The FileExtension of this filename or the Empty Fileextension if it doesn't have one.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.IsEmpty">
+            <summary>
+            	Indicates if the path is Empty
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.IsValid">
+            <summary>
+            	Flag that indicates if this path is valid. At the moment this simply means if it is not empty,
+            	as all invalid characters etc would already be rejected by the contsturctor.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeFilename.Parent">
+            <summary>
+            	The ParentDirectory of this Element or the Empty value if no parent directory was specified.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeFilename.FromPathString(System.String,System.Boolean)">
+            <summary>
+            	Creates a RelativeFilenamne from a given string. Can contain folders, separated by \, these will then be created
+            	as <see cref="T:HTS.SmartPath.RelativeDirectory"/>ies and set as the parent/ancestors of this filename.
+            </summary>
+            <param name="relativePath">Path to create the filename from.</param>
+            <param name="throwExceptionForInvalidPaths">Flag to indicate if an exception should be thrown in the path is invalid.</param>
+            <returns>The RelativeFilename constructed from relativePath or null.</returns>
+            <exception cref="T:HTS.SmartPath.PathInvalidException">The parameter throwExceptionForInvlalidPaths is true and the path was invalid.</exception>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeFilename.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeFilename.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeFilename.Equals(HTS.SmartPath.RelativeFilename)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:HTS.SmartPath.RelativeFilename.ToString">
+            <summary>
+            Returns the fully qualified type name of this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> containing a fully qualified type name.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:HTS.SmartPath.PathUtilities.GetAncestorsAndSelf(HTS.SmartPath.AbsoluteDirectory)">
+            <summary>
+            	Enumerates all Ancestors from the root until and including this item.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.PathUtilities.GetAncestors(HTS.SmartPath.AbsoluteDirectory)">
+            <summary>
+            	Enumerates all Ancestors from the root until but excluding this item.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.PathUtilities.GetAncestorsAndSelf(HTS.SmartPath.RelativeDirectory)">
+            <summary>
+            	Enumerates all Ancestors from the root until and including this item.
+            </summary>
+        </member>
+        <member name="M:HTS.SmartPath.PathUtilities.GetAncestors(HTS.SmartPath.RelativeDirectory)">
+            <summary>
+            	Enumerates all Ancestors from the root until but excluding this item.
+            </summary>
+        </member>
+    </members>
+</doc>
