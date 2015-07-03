@@ -141,6 +141,15 @@ namespace SmartPathTests
 		}
 
 		[Test]
+		public void TestSpacesValid()
+		{
+			var filename = AbsoluteFilename.FromAbsolutePath("C:\\Some file.txt", true);
+			Assert.IsFalse(filename.IsEmpty);
+			Assert.AreEqual("Some file.txt", filename.FilenameWithExtension);
+			Assert.AreEqual("Some file", filename.FileNameWithoutExtension);
+		}
+
+		[Test]
 		public void TestParentGeneration()
 		{
 			var filename = AbsoluteFilename.FromAbsolutePath("C:\\Dir\\File.txt");
@@ -362,7 +371,7 @@ namespace SmartPathTests
 			Assert.AreEqual(1, testDirectory.GetFileSystemDirectories().Count());
 			Assert.IsFalse(testDirectory.GetFileSystemFiles().Any());
 
-			var testfile = testSubDirectory.CreateFilename("test.tmp");
+			var testfile = testSubDirectory.CreateFilename("test file.tmp");
 
 			if (testfile.Exists())
 				testfile.DeleteFilesystemItemIfExists();
