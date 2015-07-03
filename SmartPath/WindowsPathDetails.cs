@@ -22,9 +22,9 @@ namespace HTS.SmartPath
 
 		internal static Regex FileExtensionRegex = new Regex(@"^(!?.*) (?# anything, non-greedy)
 																\.     (?# then a dot; after that valid extension characters that are captured as the extension group)
-																(?<Extension>[^\\/:*? "" <>|\r\n]+)$", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+																(?<Extension>[^\\/:*?""<>|\r\n]+)$", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 		internal static Regex FilenameRegex = new Regex(@"^(!?.*\\)? (?# anything, non-greedy, ending with a backslash - this captures everything up until the last backslash if it is present or nothing)
-														   (?<Filename>[^\\/:*? "" <>|\r\n]+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
+														   (?<Filename>[^\\/:*?""<>|\r\n]+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 	}
 }
