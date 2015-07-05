@@ -1,0 +1,370 @@
+
+
+<!doctype html>
+<html class="index">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>SmartPath</title>
+        <meta name="viewport" content="width=device-width">
+
+		
+					<link rel="stylesheet" type="text/css" href="assets/css/font.css?version=0.9.6.8" />
+			<link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css?version=0.9.6.8" />
+			<link rel="stylesheet" type="text/css" href="assets/css/style.css?version=0.9.6.8" />
+			<link rel="stylesheet" type="text/css" href="assets/css/dynamic.css?version=0.9.6.8" />
+			
+			<!--[if IE 8]>
+				<script src="assets/js/vendor.ie8.js?version=0.9.6.8"></script>
+			<![endif]-->
+			<![if !IE 8]>
+				<script src="assets/js/vendor.js?version=0.9.6.8"></script>
+			<![endif]>
+
+			<script src="assets/js/jquery.layout.min.js?version=0.9.6.8"></script>	
+			<script src="assets/js/app.js?version=0.9.6.8"></script>
+		
+		<script>
+			var homeString = "Home";
+			var searchIndex = [ 
+	
+			
+
+
+
+
+
+
+
+
+
+
+
+	{ "Name" : "HTS.SmartPath", "Url" : "#namespace/HTS.SmartPath", "Type" : "Namespace" },
+	
+		{ "Name" : "AbsoluteDirectory", "Url" : "#type/AbsoluteDirectory", "Type" : "Type" },
+
+		
+			{ "Name" : "Empty", "Url" : "#type/AbsoluteDirectory?Empty", "Type" : "Field" },
+		
+			{ "Name" : "AbsoluteParent", "Url" : "#type/AbsoluteDirectory?AbsoluteParent", "Type" : "Property" },
+		
+			{ "Name" : "AbsolutePath", "Url" : "#type/AbsoluteDirectory?AbsolutePath", "Type" : "Property" },
+		
+			{ "Name" : "DirectoryInfo", "Url" : "#type/AbsoluteDirectory?DirectoryInfo", "Type" : "Property" },
+		
+			{ "Name" : "DirectoryName", "Url" : "#type/AbsoluteDirectory?DirectoryName", "Type" : "Property" },
+		
+			{ "Name" : "IsEmpty", "Url" : "#type/AbsoluteDirectory?IsEmpty", "Type" : "Property" },
+		
+			{ "Name" : "IsRoot", "Url" : "#type/AbsoluteDirectory?IsRoot", "Type" : "Property" },
+		
+			{ "Name" : "IsValid", "Url" : "#type/AbsoluteDirectory?IsValid", "Type" : "Property" },
+		
+			{ "Name" : "CreateDirectoryPath", "Url" : "#type/AbsoluteDirectory?CreateDirectoryPath2", "Type" : "Method" },
+		
+			{ "Name" : "CreateDirectoryPath", "Url" : "#type/AbsoluteDirectory?CreateDirectoryPath", "Type" : "Method" },
+		
+			{ "Name" : "CreateFilename", "Url" : "#type/AbsoluteDirectory?CreateFilename2", "Type" : "Method" },
+		
+			{ "Name" : "CreateFilename", "Url" : "#type/AbsoluteDirectory?CreateFilename", "Type" : "Method" },
+		
+			{ "Name" : "CreateFileSystemDirectory", "Url" : "#type/AbsoluteDirectory?CreateFileSystemDirectory", "Type" : "Method" },
+		
+			{ "Name" : "DeleteFilesystemItemIfExists", "Url" : "#type/AbsoluteDirectory?DeleteFilesystemItemIfExists", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/AbsoluteDirectory?Equals2", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/AbsoluteDirectory?Equals", "Type" : "Method" },
+		
+			{ "Name" : "Exists", "Url" : "#type/AbsoluteDirectory?Exists", "Type" : "Method" },
+		
+			{ "Name" : "FromAbsoluteOrRelativePath", "Url" : "#type/AbsoluteDirectory?FromAbsoluteOrRelativePath", "Type" : "Method" },
+		
+			{ "Name" : "FromAbsolutePath", "Url" : "#type/AbsoluteDirectory?FromAbsolutePath", "Type" : "Method" },
+		
+			{ "Name" : "GetFileSystemDirectories", "Url" : "#type/AbsoluteDirectory?GetFileSystemDirectories", "Type" : "Method" },
+		
+			{ "Name" : "GetFileSystemFiles", "Url" : "#type/AbsoluteDirectory?GetFileSystemFiles", "Type" : "Method" },
+		
+			{ "Name" : "GetFileSystemFiles", "Url" : "#type/AbsoluteDirectory?GetFileSystemFiles2", "Type" : "Method" },
+		
+			{ "Name" : "GetHashCode", "Url" : "#type/AbsoluteDirectory?GetHashCode", "Type" : "Method" },
+		
+			{ "Name" : "GetRelativePathOrNull", "Url" : "#type/AbsoluteDirectory?GetRelativePathOrNull", "Type" : "Method" },
+		
+			{ "Name" : "op_Addition", "Url" : "#type/AbsoluteDirectory?op_Addition", "Type" : "Method" },
+		
+			{ "Name" : "op_Addition", "Url" : "#type/AbsoluteDirectory?op_Addition2", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/AbsoluteDirectory?op_Equality", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/AbsoluteDirectory?op_Equality2", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/AbsoluteDirectory?op_Equality3", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/AbsoluteDirectory?op_Inequality", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/AbsoluteDirectory?op_Inequality2", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/AbsoluteDirectory?op_Inequality3", "Type" : "Method" },
+		
+			{ "Name" : "ToString", "Url" : "#type/AbsoluteDirectory?ToString", "Type" : "Method" },
+		
+			{ "Name" : "TryCreateDirectoryPath", "Url" : "#type/AbsoluteDirectory?TryCreateDirectoryPath2", "Type" : "Method" },
+		
+			{ "Name" : "TryCreateDirectoryPath", "Url" : "#type/AbsoluteDirectory?TryCreateDirectoryPath", "Type" : "Method" },
+		
+			{ "Name" : "TryCreateFilename", "Url" : "#type/AbsoluteDirectory?TryCreateFilename2", "Type" : "Method" },
+		
+			{ "Name" : "TryCreateFilename", "Url" : "#type/AbsoluteDirectory?TryCreateFilename", "Type" : "Method" },
+		
+			{ "Name" : "TryGetRelativePath", "Url" : "#type/AbsoluteDirectory?TryGetRelativePath", "Type" : "Method" },
+		
+		{ "Name" : "AbsoluteFilename", "Url" : "#type/AbsoluteFilename", "Type" : "Type" },
+
+		
+			{ "Name" : "Empty", "Url" : "#type/AbsoluteFilename?Empty", "Type" : "Field" },
+		
+			{ "Name" : "AbsoluteParent", "Url" : "#type/AbsoluteFilename?AbsoluteParent", "Type" : "Property" },
+		
+			{ "Name" : "AbsolutePath", "Url" : "#type/AbsoluteFilename?AbsolutePath", "Type" : "Property" },
+		
+			{ "Name" : "Extension", "Url" : "#type/AbsoluteFilename?Extension", "Type" : "Property" },
+		
+			{ "Name" : "FileInfo", "Url" : "#type/AbsoluteFilename?FileInfo", "Type" : "Property" },
+		
+			{ "Name" : "FilenameWithExtension", "Url" : "#type/AbsoluteFilename?FilenameWithExtension", "Type" : "Property" },
+		
+			{ "Name" : "FileNameWithoutExtension", "Url" : "#type/AbsoluteFilename?FileNameWithoutExtension", "Type" : "Property" },
+		
+			{ "Name" : "IsEmpty", "Url" : "#type/AbsoluteFilename?IsEmpty", "Type" : "Property" },
+		
+			{ "Name" : "IsValid", "Url" : "#type/AbsoluteFilename?IsValid", "Type" : "Property" },
+		
+			{ "Name" : "AsRelativeFilename", "Url" : "#type/AbsoluteFilename?AsRelativeFilename", "Type" : "Method" },
+		
+			{ "Name" : "DeleteFilesystemItemIfExists", "Url" : "#type/AbsoluteFilename?DeleteFilesystemItemIfExists2", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/AbsoluteFilename?Equals4", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/AbsoluteFilename?Equals3", "Type" : "Method" },
+		
+			{ "Name" : "Exists", "Url" : "#type/AbsoluteFilename?Exists2", "Type" : "Method" },
+		
+			{ "Name" : "FromAbsolutePath", "Url" : "#type/AbsoluteFilename?FromAbsolutePath2", "Type" : "Method" },
+		
+			{ "Name" : "GetHashCode", "Url" : "#type/AbsoluteFilename?GetHashCode2", "Type" : "Method" },
+		
+			{ "Name" : "GetRelativePathOrNull", "Url" : "#type/AbsoluteFilename?GetRelativePathOrNull2", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/AbsoluteFilename?op_Equality4", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/AbsoluteFilename?op_Equality5", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/AbsoluteFilename?op_Equality6", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/AbsoluteFilename?op_Inequality4", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/AbsoluteFilename?op_Inequality5", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/AbsoluteFilename?op_Inequality6", "Type" : "Method" },
+		
+			{ "Name" : "ToString", "Url" : "#type/AbsoluteFilename?ToString2", "Type" : "Method" },
+		
+			{ "Name" : "TryGetRelativePath", "Url" : "#type/AbsoluteFilename?TryGetRelativePath2", "Type" : "Method" },
+		
+			{ "Name" : "WithChangedExtension", "Url" : "#type/AbsoluteFilename?WithChangedExtension", "Type" : "Method" },
+		
+		{ "Name" : "FileExtension", "Url" : "#type/FileExtension", "Type" : "Type" },
+
+		
+			{ "Name" : "Empty", "Url" : "#type/FileExtension?Empty", "Type" : "Field" },
+		
+			{ "Name" : "AsStringWithDot", "Url" : "#type/FileExtension?AsStringWithDot", "Type" : "Property" },
+		
+			{ "Name" : "AsStringWithoutDot", "Url" : "#type/FileExtension?AsStringWithoutDot", "Type" : "Property" },
+		
+			{ "Name" : "IsEmpty", "Url" : "#type/FileExtension?IsEmpty", "Type" : "Property" },
+		
+			{ "Name" : "IsValid", "Url" : "#type/FileExtension?IsValid", "Type" : "Property" },
+		
+			{ "Name" : "Equals", "Url" : "#type/FileExtension?Equals6", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/FileExtension?Equals5", "Type" : "Method" },
+		
+			{ "Name" : "GetHashCode", "Url" : "#type/FileExtension?GetHashCode3", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/FileExtension?op_Equality7", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/FileExtension?op_Equality8", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/FileExtension?op_Equality9", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/FileExtension?op_Inequality7", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/FileExtension?op_Inequality8", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/FileExtension?op_Inequality9", "Type" : "Method" },
+		
+			{ "Name" : "ToString", "Url" : "#type/FileExtension?ToString3", "Type" : "Method" },
+		
+		{ "Name" : "PathInvalidException", "Url" : "#type/PathInvalidException", "Type" : "Type" },
+
+		
+		{ "Name" : "PathUtilities", "Url" : "#type/PathUtilities", "Type" : "Type" },
+
+		
+			{ "Name" : "IsEntirePathIsDescendingOnly", "Url" : "#type/PathUtilities?IsEntirePathIsDescendingOnly", "Type" : "Method" },
+		
+		{ "Name" : "RelativeDirectory", "Url" : "#type/RelativeDirectory", "Type" : "Type" },
+
+		
+			{ "Name" : "Empty", "Url" : "#type/RelativeDirectory?Empty", "Type" : "Field" },
+		
+			{ "Name" : "UpOneDirectory", "Url" : "#type/RelativeDirectory?UpOneDirectory", "Type" : "Field" },
+		
+			{ "Name" : "DirectoryName", "Url" : "#type/RelativeDirectory?DirectoryName", "Type" : "Property" },
+		
+			{ "Name" : "FullPath", "Url" : "#type/RelativeDirectory?FullPath", "Type" : "Property" },
+		
+			{ "Name" : "IsEmpty", "Url" : "#type/RelativeDirectory?IsEmpty", "Type" : "Property" },
+		
+			{ "Name" : "IsValid", "Url" : "#type/RelativeDirectory?IsValid", "Type" : "Property" },
+		
+			{ "Name" : "Parent", "Url" : "#type/RelativeDirectory?Parent", "Type" : "Property" },
+		
+			{ "Name" : "CreateDirectoryPath", "Url" : "#type/RelativeDirectory?CreateDirectoryPath3", "Type" : "Method" },
+		
+			{ "Name" : "CreateFilename", "Url" : "#type/RelativeDirectory?CreateFilename3", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/RelativeDirectory?Equals8", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/RelativeDirectory?Equals7", "Type" : "Method" },
+		
+			{ "Name" : "FromPathString", "Url" : "#type/RelativeDirectory?FromPathString", "Type" : "Method" },
+		
+			{ "Name" : "GetHashCode", "Url" : "#type/RelativeDirectory?GetHashCode4", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/RelativeDirectory?op_Equality10", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/RelativeDirectory?op_Equality11", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/RelativeDirectory?op_Equality12", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/RelativeDirectory?op_Inequality10", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/RelativeDirectory?op_Inequality11", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/RelativeDirectory?op_Inequality12", "Type" : "Method" },
+		
+			{ "Name" : "ToString", "Url" : "#type/RelativeDirectory?ToString4", "Type" : "Method" },
+		
+		{ "Name" : "RelativeFilename", "Url" : "#type/RelativeFilename", "Type" : "Type" },
+
+		
+			{ "Name" : "Empty", "Url" : "#type/RelativeFilename?Empty", "Type" : "Field" },
+		
+			{ "Name" : "Extension", "Url" : "#type/RelativeFilename?Extension", "Type" : "Property" },
+		
+			{ "Name" : "FilenameWithExtension", "Url" : "#type/RelativeFilename?FilenameWithExtension", "Type" : "Property" },
+		
+			{ "Name" : "FilenameWithoutExtension", "Url" : "#type/RelativeFilename?FilenameWithoutExtension", "Type" : "Property" },
+		
+			{ "Name" : "FullPath", "Url" : "#type/RelativeFilename?FullPath", "Type" : "Property" },
+		
+			{ "Name" : "IsEmpty", "Url" : "#type/RelativeFilename?IsEmpty", "Type" : "Property" },
+		
+			{ "Name" : "IsValid", "Url" : "#type/RelativeFilename?IsValid", "Type" : "Property" },
+		
+			{ "Name" : "Parent", "Url" : "#type/RelativeFilename?Parent", "Type" : "Property" },
+		
+			{ "Name" : "Equals", "Url" : "#type/RelativeFilename?Equals10", "Type" : "Method" },
+		
+			{ "Name" : "Equals", "Url" : "#type/RelativeFilename?Equals9", "Type" : "Method" },
+		
+			{ "Name" : "FromPathString", "Url" : "#type/RelativeFilename?FromPathString2", "Type" : "Method" },
+		
+			{ "Name" : "GetHashCode", "Url" : "#type/RelativeFilename?GetHashCode5", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/RelativeFilename?op_Equality13", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/RelativeFilename?op_Equality14", "Type" : "Method" },
+		
+			{ "Name" : "op_Equality", "Url" : "#type/RelativeFilename?op_Equality15", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/RelativeFilename?op_Inequality13", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/RelativeFilename?op_Inequality14", "Type" : "Method" },
+		
+			{ "Name" : "op_Inequality", "Url" : "#type/RelativeFilename?op_Inequality15", "Type" : "Method" },
+		
+			{ "Name" : "ToString", "Url" : "#type/RelativeFilename?ToString5", "Type" : "Method" },
+		
+
+		];
+		</script>
+
+    </head>
+    <body>   
+		<div class="ui-layout-north">
+							<h1 id="sitetitle"><a href="index.html">SmartPath</a></h1>
+						<div id="subtitle"><p>Home</p></div>
+		</div>
+        <div class="ui-layout-south">
+			<div class="user-footer markdown">
+				
+			</div>
+			<div class="sd-footer">
+				
+				 <a href="https://github.com/danyx23/smartpath" target="_blank">SmartPath</a> 1.0.2 by <a href="http://danielbachler.de" target="_blank">Daniel Bachler</a> - generated by <a href="http://sharpDox.de" target="_blank">sharpDox</a>
+			</div>
+		</div>
+        <div class="ui-layout-west">
+			<div id="search">
+				<i class="icon-search"></i> <input id="searchInput" type="text" />
+				<div id="searchResults">
+				</div>
+			</div>
+			<div id="navigation">
+				<ul>
+	<li data-jstree='{"icon":"icon-home"}' id="node-home" class="jstree-open"><a href="#home">Home</a>
+	<ul>
+						
+
+	
+		<li data-jstree='{"icon":"./assets/images/icons/namespace_public.png"}' id="node-namespace/HTS.SmartPath"><a href="#namespace/HTS.SmartPath">HTS.SmartPath</a> 
+ 
+
+<ul>
+
+	
+		<li data-jstree='{"icon":"./assets/images/icons/struct_public.png"}' id="node-type/AbsoluteDirectory"><a href="#type/AbsoluteDirectory">AbsoluteDirectory</a></li>
+	
+		<li data-jstree='{"icon":"./assets/images/icons/struct_public.png"}' id="node-type/AbsoluteFilename"><a href="#type/AbsoluteFilename">AbsoluteFilename</a></li>
+	
+		<li data-jstree='{"icon":"./assets/images/icons/struct_public.png"}' id="node-type/FileExtension"><a href="#type/FileExtension">FileExtension</a></li>
+	
+		<li data-jstree='{"icon":"./assets/images/icons/class_public.png"}' id="node-type/PathInvalidException"><a href="#type/PathInvalidException">PathInvalidException</a></li>
+	
+		<li data-jstree='{"icon":"./assets/images/icons/class_public.png"}' id="node-type/PathUtilities"><a href="#type/PathUtilities">PathUtilities</a></li>
+	
+		<li data-jstree='{"icon":"./assets/images/icons/struct_public.png"}' id="node-type/RelativeDirectory"><a href="#type/RelativeDirectory">RelativeDirectory</a></li>
+	
+		<li data-jstree='{"icon":"./assets/images/icons/struct_public.png"}' id="node-type/RelativeFilename"><a href="#type/RelativeFilename">RelativeFilename</a></li>
+
+</ul>
+
+</li>
+
+
+			</ul>
+	</li>	
+</ul>
+			</div>
+		</div>
+		<div id="loader"><i class="icon-refresh icon-spin"></i></div>
+		<iframe id="content" class="ui-layout-center" frameborder="0" width="100%" src="article/home.html"></iframe>
+    </body>
+</html>
+
