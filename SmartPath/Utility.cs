@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using HTS.SmartPath.PathFragments;
 
 namespace HTS.SmartPath
 {
@@ -36,112 +38,29 @@ namespace HTS.SmartPath
 			return path.EndsWith(WindowsPathDetails.DirectorySeparator.ToString()) ? path : (path + WindowsPathDetails.DirectorySeparator);
 		}
 
-		/// <summary>
-		///		Enumerates all Ancestors from the root until and including this item.
-		/// </summary>
-		internal static IEnumerable<AbsoluteDirectory> GetAncestorsAndSelf(AbsoluteDirectory dir)
+		internal static IEnumerable<PathFragment> GetPathFragments(Match match, bool treatFileMatchAsDirectory)
 		{
-			return GetAncestors(dir).Concat(EnumerableForSingleItem(dir));
+			if (match.Groups["root"].Success)
+				yield return new RootFragment(match.Groups["root"].Value);
+			foreach (Capture folder in match.Groups["folders"].Captures)
+				yield return new DirectoryFragment(folder.Value.TrimEnd('\\'));
+			if (match.Groups["file"].Success)
+				if (treatFileMatchAsDirectory)
+					yield return new DirectoryFragment(match.Groups["file"].Value);
+				else
+					yield return new FileFragment(match.Groups["file"].Value);
 		}
 
-		/// <summary>
-		///		Enumerates all Ancestors from the root until but excluding this item.
-		/// </summary>
-		internal static IEnumerable<AbsoluteDirectory> GetAncestors(AbsoluteDirectory dir)
+		public static bool IsEntirePathDescendingOnly(IEnumerable<PathFragment> pathFragments)
 		{
-			var parent = dir.AbsoluteParent;
-			if (parent.IsEmpty)
-				return Enumerable.Empty<AbsoluteDirectory>();
-
-			var parentAncestors = GetAncestors(parent);
-
-			var parentAsEnumerable = EnumerableForSingleItem(parent);
-
-			return parentAncestors.Concat(parentAsEnumerable);
-
-		}
-
-		/// <summary>
-		///		Enumerates all Ancestors from the root until and including this item.
-		/// </summary>
-		internal static IEnumerable<RelativeDirectory> GetAncestorsAndSelf(RelativeDirectory dir)
-		{
-			var self = Enumerable.Empty<RelativeDirectory>();
-			if (!dir.IsEmpty)
-				self = EnumerableForSingleItem(dir);
-			return GetAncestors(dir).Concat(self);
-		}
-
-		/// <summary>
-		///		Enumerates all Ancestors from the root until but excluding this item.
-		/// </summary>
-		internal static IEnumerable<RelativeDirectory> GetAncestors(RelativeDirectory dir)
-		{
-			var parent = dir.Parent;
-			if (parent.IsEmpty)
-				return Enumerable.Empty<RelativeDirectory>();
-
-			var parentAncestors = GetAncestors(parent);
-
-			var parentAsEnumerable = EnumerableForSingleItem(parent);
-
-			return parentAncestors.Concat(parentAsEnumerable);
-
-		}
-
-		internal static IEnumerable<string> DirectoriesInString(string relativePath, bool addFileMatchAsDirectory=true)
-		{
-			var match = WindowsPathDetails.RelativePathRegex.Match(relativePath);
-			if (!match.Success || match.Groups["root"].Success)
-				throw new PathInvalidException("The give path was not just a relative folder: " + relativePath);
-
-			IEnumerable<string> folders = Enumerable.Empty<string>();
-
-			if (match.Groups["folders"].Success)
-			{
-				folders = match.Groups["folders"].Value.Split(WindowsPathDetails.DirectorySeparator)
-												 .Where(item => !String.IsNullOrWhiteSpace(item))
-												 .Select(item => item.Trim());
-				
-			}
-			if (match.Groups["file"].Success && addFileMatchAsDirectory)
-			{
-				folders = folders.Concat(EnumerableForSingleItem(match.Groups["file"].Value.Trim()));
-			}
-			return folders;
-		}
-
-		internal static RelativeDirectory GetRelativeDirectoryParentForDirectory(string path)
-		{
-			if (String.IsNullOrWhiteSpace(path))
-				return RelativeDirectory.Empty;
-
-			var directories = DirectoriesInString(path, true).ToList();
-			if (directories.Count <= 1)
-				return RelativeDirectory.Empty;
-
-			return new RelativeDirectory(String.Join(WindowsPathDetails.DirectorySeparator.ToString(), directories.Take(directories.Count - 1)));
-		}
-
-		internal static RelativeDirectory GetRelativeDirectoryParentForFile(string path)
-		{
-			if (String.IsNullOrWhiteSpace(path))
-				return RelativeDirectory.Empty;
-
-			var directories = DirectoriesInString(path, false).ToList();
-			if (directories.Count == 0)
-				return RelativeDirectory.Empty;
-
-			return new RelativeDirectory(String.Join(WindowsPathDetails.DirectorySeparator.ToString(), directories));
-		}
-
-		public static bool IsEntirePathIsDescendingOnly(RelativeDirectory directory)
-		{
-			if (directory.IsEmpty)
+			if (pathFragments == null || !pathFragments.Any())
 				return true;
-			return !StringComparer.InvariantCultureIgnoreCase.Equals(directory.DirectoryName, RelativeDirectory.UpOneDirectory.DirectoryName)
-					&& (directory.Parent.IsEmpty 
-						|| IsEntirePathIsDescendingOnly(directory.Parent));
+			return !pathFragments.Any(fragment => fragment.Equals(DirectoryFragment.UpOneDirectory));
+		}
+
+		public static bool IsEntirePathDescendingOnly(IFragmentProvider path)
+		{
+			return IsEntirePathDescendingOnly(path.PathFragments);
 		}
 	}
 }

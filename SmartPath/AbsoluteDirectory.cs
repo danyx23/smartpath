@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text.RegularExpressions;
+using HTS.SmartPath.PathFragments;
 
 namespace HTS.SmartPath
 {
@@ -14,15 +15,15 @@ namespace HTS.SmartPath
 	///		back into a string, a backslash character will be appended to distinguish
 	///		it from filenames
 	/// </summary>
-	public struct AbsoluteDirectory : IEquatable<AbsoluteDirectory>
+	public struct AbsoluteDirectory : IEquatable<AbsoluteDirectory>, IFragmentProvider
 	{
 		/// <summary>
 		///		Default value for this type that represents no directory.
 		/// </summary>
 		public static AbsoluteDirectory Empty = new AbsoluteDirectory();
 
+		private readonly PathFragment[] m_PathFragments;
 		private readonly string m_AbsolutePath;
-		private readonly string m_DirectoryNameOnly;
 
 		/// <summary>
 		///		Gets a <see cref="System.IO.DirectoryInfo"/>.
@@ -61,12 +62,12 @@ namespace HTS.SmartPath
 		/// <summary>
 		///		The name of this directory, without any parent directories or sepration characters. Empty string if this is the Empty path.
 		/// </summary>
-		public string DirectoryName { get { return m_DirectoryNameOnly ?? ""; } }
+		public string DirectoryName { get { return IsEmpty ? "" : m_PathFragments.Last().Fragment; } }
 
 		/// <summary>
 		///		Tells if this directory is a root directory
 		/// </summary>
-		public bool IsRoot { get { return string.IsNullOrEmpty(m_DirectoryNameOnly); } }
+		public bool IsRoot { get { return m_PathFragments.Length == 1; } }
 
 		/// <summary>
 		///		Indicates if the path is Empty
@@ -83,6 +84,13 @@ namespace HTS.SmartPath
 		public bool IsValid { get { return !IsEmpty; } }
 
 		/// <summary>
+		///	Enumerates the fragments of this path. This will yield nothing for the empty path,
+		/// just one RootFragment (containing C:\ or \\server\share\ ) if this is a root element, and otherwise
+		/// one RootFragment for the root and then one DirectoryFragment for every directory.
+		/// </summary>
+		public IEnumerable<PathFragment> PathFragments { get { return m_PathFragments ?? Enumerable.Empty<PathFragment>(); } }
+
+		/// <summary>
 		///		Initializing Contstructor. Takes a string and creates an absolute directory from it.
 		///		Attention: throws an exception if the path is invalid.		
 		/// </summary>
@@ -93,15 +101,15 @@ namespace HTS.SmartPath
 			if (string.IsNullOrEmpty(absolutePath))
 				throw new PathInvalidException("Given path was empty");
 
-			absolutePath = absolutePath.Trim();
+			absolutePath = PathUtilities.EnsureEndsWithBackslash(absolutePath.Trim());
 
 			var match = WindowsPathDetails.AbsolutePathRegex.Match(absolutePath);
 			if (!match.Success)
 				throw new PathInvalidException("Path was invalid: " + absolutePath);
 
-			m_AbsolutePath = PathUtilities.EnsureEndsWithBackslash(absolutePath);
+			m_AbsolutePath = absolutePath;
 
-			m_DirectoryNameOnly = ExtractDirectoryName(match);
+			m_PathFragments = PathUtilities.GetPathFragments(match, true).ToArray();
 		}
 
 		internal AbsoluteDirectory(AbsoluteDirectory parent, string relativePath)
@@ -109,10 +117,13 @@ namespace HTS.SmartPath
 			if (parent.IsEmpty)
 				throw new ArgumentException("Parent can not be empty!");
 
-			relativePath = relativePath.Trim();
+			var relativeDir = RelativeDirectory.FromPathString(relativePath, true);
 
-			m_AbsolutePath = parent.AbsolutePath + PathUtilities.EnsureEndsWithBackslash(relativePath);
-			m_DirectoryNameOnly = relativePath;
+			relativePath = PathUtilities.EnsureEndsWithBackslash(relativePath.Trim());
+
+			m_AbsolutePath = parent.AbsolutePath + relativePath;
+			
+			m_PathFragments = parent.m_PathFragments.Concat(relativeDir.PathFragments).ToArray();
 		}
 
 		/// <summary>
@@ -160,6 +171,69 @@ namespace HTS.SmartPath
 			if (relativeDirectory.IsValid)
 				return workingDirectory.CreateDirectoryPath(relativeDirectory);
 			return Empty;
+		}
+
+		public static AbsoluteDirectory FromPathFragments(IEnumerable<PathFragment> fragments, bool throwExceptionForInvalidPaths = false)
+		{
+			AbsoluteDirectory returnVal = Empty;
+
+			if (fragments.Any())
+			{
+				if (!(fragments.First() is RootFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("AbsoluteDirectory must start with a root");
+				}
+				else if (fragments.Last() is FileFragment)
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("AbsoluteDirectory must not end with a file");
+				}
+				else if (fragments.Count() > 1 && !fragments.Skip(1).All(fragment => fragment is DirectoryFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("AbsoluteDirectory must only contain directories after the root");
+				}
+				else
+					returnVal = new AbsoluteDirectory(string.Join("", fragments.Select(fragment => fragment.ConcatenableFragment)));
+			}
+			return returnVal;
+		}
+
+		public bool IsBelow(AbsoluteDirectory suspectedDirectoryAbove)
+		{
+			if (this.IsEmpty)
+				return false;
+
+			if (suspectedDirectoryAbove.IsEmpty)
+				return false;
+
+			RelativeDirectory relativeDirectory;
+			if (TryGetRelativePath(suspectedDirectoryAbove, out relativeDirectory))
+				return PathUtilities.IsEntirePathDescendingOnly(relativeDirectory);
+			return false;
+		}
+
+		public bool IsAbove(AbsoluteDirectory suspectedDirectoryBelow)
+		{
+			if (suspectedDirectoryBelow.IsEmpty)
+				return false;
+
+			if (this.IsEmpty)
+				return false;
+
+			return suspectedDirectoryBelow.IsBelow(this);
+		}
+
+		public bool IsAbove(AbsoluteFilename suspectedFileBelow)
+		{
+			if (suspectedFileBelow.IsEmpty)
+				return false;
+
+			if (this.IsEmpty)
+				return false;
+
+			return suspectedFileBelow.IsBelow(this);
 		}
 
 		/// <summary>
@@ -363,9 +437,6 @@ namespace HTS.SmartPath
 		/// <exception cref="UnauthorizedAccessException"></exception>
 		public IEnumerable<AbsoluteFilename> GetFileSystemFiles(FileExtension filter, bool searchInSubdirectories = false)
 		{
-			if (filter.IsEmpty)
-				throw new ArgumentNullException("filter");
-
 			return GetFileSystemFiles("*" + filter.AsStringWithDot, searchInSubdirectories);
 		}
 
@@ -441,31 +512,31 @@ namespace HTS.SmartPath
 			if (baseDirectory.IsEmpty)
 				throw new ArgumentNullException("baseDirectory");
 
-			var ancestors = PathUtilities.GetAncestorsAndSelf(this).ToList();
-			var baseDirAncestors = PathUtilities.GetAncestorsAndSelf(baseDirectory).ToList();
+			var ancestors = PathFragments;
+			var baseDirAncestors = baseDirectory.PathFragments;
 
 			var zippedAncestors = PathUtilities.ZipExhaustive(baseDirAncestors, ancestors).ToList();
 
 			var differentDirectories = new List<string>();
 
-			// If the first item is different then the paths do not share a common root, return null
-			if (zippedAncestors.Any() && !zippedAncestors[0].Item1.IsEmpty && !zippedAncestors[0].Item2.IsEmpty && !zippedAncestors[0].Item1.Equals(zippedAncestors[0].Item2))
+			// If the first item is different then the paths do not share a common root, return false
+			if (zippedAncestors.Any() && zippedAncestors[0].Item1 != null && zippedAncestors[0].Item2 != null && !zippedAncestors[0].Item1.Equals(zippedAncestors[0].Item2))
 				return false;
 
 			foreach (var ancestorPair in zippedAncestors)
 			{
 				bool ancestorsEqual = false;
-				if (!ancestorPair.Item1.IsEmpty && !ancestorPair.Item2.IsEmpty)
+				if (ancestorPair.Item1 != null && ancestorPair.Item2 != null)
 					ancestorsEqual = ancestorPair.Item1.Equals(ancestorPair.Item2);
 
-				if (ancestorPair.Item1.IsEmpty)
-					differentDirectories.Add(ancestorPair.Item2.DirectoryName);
-				else if (ancestorPair.Item2.IsEmpty)
+				if (ancestorPair.Item1 == null)
+					differentDirectories.Add(ancestorPair.Item2.Fragment);
+				else if (ancestorPair.Item2 == null)
 					differentDirectories.Insert(0, "..");
 				else if (!ancestorsEqual)
 				{
 					differentDirectories.Insert(0, "..");
-					differentDirectories.Add(ancestorPair.Item2.DirectoryName);
+					differentDirectories.Add(ancestorPair.Item2.Fragment);
 				}
 			}
 
@@ -616,17 +687,21 @@ namespace HTS.SmartPath
 
 		private AbsoluteDirectory CombineWithRelativePath(RelativeDirectory relDir)
 		{
-			if (relDir.IsEmpty)
-				throw new PathInvalidException("The given path was empty");
-
 			AbsoluteDirectory currentParent = this;
 
-			foreach (var item in PathUtilities.GetAncestorsAndSelf(relDir))
+			if (currentParent.IsEmpty)
+				throw new PathInvalidException("Can not combine with empty base path");
+
+			foreach (var item in relDir.PathFragments)
 			{
-				if (item.Equals(RelativeDirectory.UpOneDirectory))
+				if (item.Equals(DirectoryFragment.UpOneDirectory))
+				{
 					currentParent = currentParent.AbsoluteParent;
-				else if (!item.Equals(RelativeDirectory.Empty))
-					currentParent = new AbsoluteDirectory(currentParent, item.DirectoryName);
+					if (currentParent.IsEmpty)
+						throw new PathInvalidException(string.Format("Combination of path {0} with {1} went up above the root directory", AbsolutePath, relDir.FullPath));
+				}
+				else if (!item.IsEmpty)
+					currentParent = new AbsoluteDirectory(currentParent, item.Fragment);
 			}
 
 			return currentParent;
@@ -634,14 +709,12 @@ namespace HTS.SmartPath
 
 		private AbsoluteFilename CombineWithRelativePath(RelativeFilename relFile)
 		{
-			if (relFile.IsEmpty)
-				throw new PathInvalidException("The given path was empty");
-
 			AbsoluteDirectory currentParent = this;
-			if (PathUtilities.GetAncestorsAndSelf(relFile.Parent).Any())
-				currentParent = CombineWithRelativePath(relFile.Parent);
 
-			return new AbsoluteFilename(currentParent, relFile.FilenameWithExtension);
+			if (currentParent.IsEmpty)
+				throw new PathInvalidException("Can not combine with empty base path");
+
+			return new AbsoluteFilename(currentParent, relFile);
 		}
 
 		private static string ExtractDirectoryName(string absolutePath)

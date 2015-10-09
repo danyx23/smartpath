@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using HTS.SmartPath.PathFragments;
 
 namespace HTS.SmartPath
 {
@@ -8,7 +10,7 @@ namespace HTS.SmartPath
 	///		to express the parent directory ("..") or the empty directory (useful as a result if
 	///		one attempts to get the relative path from one dir to another when they are the same)
 	/// </summary>
-	public struct RelativeDirectory : IEquatable<RelativeDirectory>
+	public struct RelativeDirectory : IEquatable<RelativeDirectory>, IFragmentProvider
 	{
 		/// <summary>
 		///		Represents an empty directory (useful as a result for getting relative paths if they are identical).
@@ -18,26 +20,15 @@ namespace HTS.SmartPath
 		/// <summary>
 		///		Represenst the parent directory in paths ("..")
 		/// </summary>
-		public static RelativeDirectory UpOneDirectory = new RelativeDirectory("..");
+		public static RelativeDirectory UpOneDirectory = new RelativeDirectory(DirectoryFragment.UpOneDirectory.Fragment);
 
 		private readonly string m_EntireRelativePath;
-		private readonly string m_DirectoryName;
+		private readonly PathFragment[] m_PathFragments;
 
 		/// <summary>
 		///		The name of this directory, without any separation characters or an empty string if it is the Empty value.
 		/// </summary>
-		public string DirectoryName { get { return m_DirectoryName ?? ""; } }
-
-		/// <summary>
-		///		The ParentDirectory of this Element or the Empty value if no parent directory was specified.
-		/// </summary>
-		public RelativeDirectory Parent
-		{
-			get 
-			{
-				return PathUtilities.GetRelativeDirectoryParentForDirectory(m_EntireRelativePath);
-			}
-		}
+		public string DirectoryName { get { return IsEmpty ? "" : m_PathFragments.Last().Fragment; } }
 
 		/// <summary>
 		///		Indicates if the path is Empty
@@ -57,7 +48,31 @@ namespace HTS.SmartPath
 		/// </summary>
 		public bool IsValid { get { return !IsEmpty; } }
 
+		/// <summary>
+		///	Enumerates the fragments of this path. This will yield nothing for the empty path, and otherwise
+		/// one DirectoryFragment for every directory.
+		/// </summary>
+		public IEnumerable<PathFragment> PathFragments { get { return m_PathFragments ?? Enumerable.Empty<PathFragment>(); } }
+
 		internal RelativeDirectory(RelativeDirectory parent, string relativePath)
+		{
+			if (string.IsNullOrWhiteSpace(relativePath))
+				throw new PathInvalidException("The filename was empty");
+
+			relativePath = relativePath.Trim();
+
+			var entireRelativePath = PathUtilities.EnsureEndsWithBackslash(parent.m_EntireRelativePath + relativePath);
+
+			var match = WindowsPathDetails.RelativePathRegex.Match(entireRelativePath);
+			if (!match.Success || match.Groups["root"].Success)
+				throw new PathInvalidException("The give path was not just a relative folder: " + relativePath);
+
+			m_EntireRelativePath = entireRelativePath;
+
+			m_PathFragments = PathUtilities.GetPathFragments(match, true).ToArray();
+		}
+
+		internal RelativeDirectory(string relativePath)
 		{
 			if (string.IsNullOrWhiteSpace(relativePath))
 				throw new PathInvalidException("The filename was empty");
@@ -68,29 +83,15 @@ namespace HTS.SmartPath
 			if (!match.Success || match.Groups["root"].Success)
 				throw new PathInvalidException("The give path was not just a relative folder: " + relativePath);
 
-			if (relativePath.EndsWith(WindowsPathDetails.DirectorySeparator.ToString()))
-				relativePath = relativePath.Substring(0, relativePath.Length - 1);
+			m_PathFragments = PathUtilities.GetPathFragments(match, true).ToArray();
 
-			m_EntireRelativePath = PathUtilities.EnsureEndsWithBackslash(parent.m_EntireRelativePath + relativePath);
-			m_DirectoryName = relativePath;
-		}
-
-		internal RelativeDirectory(string relativePath)
-		{
-			if (string.IsNullOrWhiteSpace(relativePath))
-				throw new PathInvalidException("The filename was empty");
-
-			var directories = PathUtilities.DirectoriesInString(relativePath).ToList();
-
-			if (directories.Count == 0)
+			if (m_PathFragments.Length == 0)
 			{
-				m_DirectoryName = "";
 				m_EntireRelativePath = "";
 			}
 			else
 			{
-				m_DirectoryName = directories.Last();
-				m_EntireRelativePath = PathUtilities.EnsureEndsWithBackslash(string.Join(WindowsPathDetails.DirectorySeparator.ToString(), directories));
+				m_EntireRelativePath = PathUtilities.EnsureEndsWithBackslash(relativePath);
 			}
 				
 		}
@@ -137,6 +138,33 @@ namespace HTS.SmartPath
 
 				return Empty;
 			}
+		}
+
+		public static RelativeDirectory FromPathFragments(IEnumerable<PathFragment> fragments, bool throwExceptionForInvalidPaths = false)
+		{
+			RelativeDirectory returnVal = Empty;
+
+			if (fragments.Any())
+			{
+				if (fragments.First() is RootFragment)
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("RelativeDirectory must not start with a root");
+				}
+				else if (fragments.Last() is FileFragment)
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("RelativeDirectory must not end with a file");
+				}
+				else if (!fragments.All(fragment => fragment is DirectoryFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("RelativeDirectory must only contain directories");
+				}
+				else
+					returnVal = new RelativeDirectory(string.Join("", fragments.Select(fragment => fragment.ConcatenableFragment)));
+			}
+			return returnVal;
 		}
 
 		/// <summary>

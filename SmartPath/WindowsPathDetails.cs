@@ -8,15 +8,15 @@ namespace HTS.SmartPath
 {
 	static class WindowsPathDetails
 	{
-		internal static Regex AbsolutePathRegex = new Regex(@"^(?<root>(?:[a-z]:|\\\\[a-z0-9_.$●-]+\\[a-z0-9_.$●-]+)\\?)
+		internal static Regex AbsolutePathRegex = new Regex(@"^(?<root>(?:[a-z]:|\\\\[a-z0-9_.$●-]+\\[a-z0-9_.$●-]+)\\)
 															   (?<folders>[^\\/:*?""<>|\r\n]+\\)*
 															   (?<file>[^\\/:*?""<>|\r\n]+)?$"
 															, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-		internal static Regex RelativePathRegex = new Regex(@"^(?<root>(?:[a-z]:|\\\\[a-z0-9_.$●-]+\\[a-z0-9_.$●-]+)\\?)?
-															   (?<folders>([^\\/:*?""<>|\r\n]+\\)+)?
+		internal static Regex RelativePathRegex = new Regex(@"^(?<root>(?:[a-z]:|\\\\[a-z0-9_.$●-]+\\[a-z0-9_.$●-]+)\\)?
+															   (?<folders>[^\\/:*?""<>|\r\n]+\\)*
 															   (?<file>[^\\/:*?""<>|\r\n]+)?$"
-															, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+															, RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
 		internal static char DirectorySeparator = '\\';
 
