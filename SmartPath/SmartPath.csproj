@@ -39,6 +39,11 @@
     <Compile Include="AbsoluteDirectory.cs" />
     <Compile Include="AbsoluteFilename.cs" />
     <Compile Include="FileExtension.cs" />
+    <Compile Include="PathFragments\DirectoryFragment.cs" />
+    <Compile Include="PathFragments\FileFragment.cs" />
+    <Compile Include="PathFragments\IFragmentProvider.cs" />
+    <Compile Include="PathFragments\PathFragment.cs" />
+    <Compile Include="PathFragments\RootFragment.cs" />
     <Compile Include="PathInvalidException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RelativeDirectory.cs" />

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HTS.SmartPath.PathFragments;
 
 namespace HTS.SmartPath
 {
@@ -7,10 +10,10 @@ namespace HTS.SmartPath
 	///		include relative parent directories (e.g. "somedir\filename.txt") or even parent directory
 	///		specifiers (e.g. "..\filename.txt")
 	/// </summary>
-	public struct RelativeFilename : IEquatable<RelativeFilename>
+	public struct RelativeFilename : IEquatable<RelativeFilename>, IFragmentProvider
 	{
 		private readonly string m_EntireRelativePath;
-		private readonly string m_Filename;
+		private readonly PathFragment[] m_PathFragments;
 
 		/// <summary>
 		///		Default value for this type that represents no filename.
@@ -20,7 +23,7 @@ namespace HTS.SmartPath
 		/// <summary>
 		///		The filename including the file extension or an empty string for the Empty value.
 		/// </summary>
-		public string FilenameWithExtension { get { return m_Filename ?? ""; } }
+		public string FilenameWithExtension { get { return IsEmpty ? "" : m_PathFragments.Last().Fragment; } }
 
 		/// <summary>
 		///		The filename without the file extension or the empty string for the Empty value.
@@ -29,13 +32,13 @@ namespace HTS.SmartPath
 		{
 			get
 			{
-				if (m_Filename == null)
+				if (FilenameWithExtension == null)
 					return "";
 
-				var lastIndexOfDot = m_Filename.LastIndexOf(".");
+				var lastIndexOfDot = FilenameWithExtension.LastIndexOf(".");
 				if (lastIndexOfDot >= 0)
-					return m_Filename.Substring(0, lastIndexOfDot);
-				return m_Filename;
+					return FilenameWithExtension.Substring(0, lastIndexOfDot);
+				return FilenameWithExtension;
 			}
 		}
 
@@ -53,10 +56,10 @@ namespace HTS.SmartPath
 		{
 			get
 			{
-				if (m_Filename == null)
+				if (IsEmpty)
 					return FileExtension.Empty;
 
-				var extensionMatch = WindowsPathDetails.FileExtensionRegex.Match(m_Filename);
+				var extensionMatch = WindowsPathDetails.FileExtensionRegex.Match(FilenameWithExtension);
 
 				if (!extensionMatch.Success)
 					return FileExtension.Empty;
@@ -76,12 +79,10 @@ namespace HTS.SmartPath
 		public bool IsValid { get { return !IsEmpty; } }
 
 		/// <summary>
-		///		The ParentDirectory of this Element or the Empty value if no parent directory was specified.
+		///	Enumerates the fragments of this path. This will yield nothing for the empty path,
+		/// and otherwise one DirectoryFragment for every directory and finally a FileFragment
 		/// </summary>
-		public RelativeDirectory Parent
-		{
-			get { return PathUtilities.GetRelativeDirectoryParentForFile(m_EntireRelativePath); }
-		}
+		public IEnumerable<PathFragment> PathFragments { get { return m_PathFragments ?? Enumerable.Empty<PathFragment>(); } }
 
 		internal RelativeFilename(RelativeDirectory parent, string relativePath)
 		{
@@ -90,14 +91,16 @@ namespace HTS.SmartPath
 
 			relativePath = relativePath.Trim();
 
-			var match = WindowsPathDetails.RelativePathRegex.Match(relativePath);
+			var entirePath = parent.FullPath + relativePath;
+
+			var match = WindowsPathDetails.RelativePathRegex.Match(entirePath);
 			if (!match.Success)
 				throw new PathInvalidException("The given path contained illegal characters: " + relativePath);
-			if (match.Groups["root"].Success || match.Groups["folders"].Success || !match.Groups["file"].Success)
-				throw new PathInvalidException("The given path was not just a relative filename: " + relativePath);
+			if (match.Groups["root"].Success && !match.Groups["file"].Success)
+				throw new PathInvalidException("The given path was not a relative filename: " + relativePath);
 
-			m_Filename = relativePath;
-			m_EntireRelativePath = parent.FullPath + m_Filename;
+			m_PathFragments = PathUtilities.GetPathFragments(match, false).ToArray();
+			m_EntireRelativePath = entirePath;
 		}
 
 		internal RelativeFilename(string relativePath)
@@ -117,13 +120,8 @@ namespace HTS.SmartPath
 
 			string basePath = "";
 
-			if (match.Groups["folders"].Success)
-			{
-				basePath = PathUtilities.EnsureEndsWithBackslash(RelativeDirectory.FromPathString(match.Groups["folders"].Value).FullPath);
-			}
-
-			m_Filename = match.Groups["file"].Value;
-			m_EntireRelativePath = basePath + m_Filename;
+			m_PathFragments = PathUtilities.GetPathFragments(match, false).ToArray();
+			m_EntireRelativePath = relativePath;
 		}
 
 		/// <summary>
@@ -150,6 +148,33 @@ namespace HTS.SmartPath
 
 				return Empty;
 			}
+		}
+
+		public static RelativeFilename FromPathFragments(IEnumerable<PathFragment> fragments, bool throwExceptionForInvalidPaths = false)
+		{
+			RelativeFilename returnVal = Empty;
+
+			if (fragments.Any())
+			{
+				if (fragments.First() is RootFragment)
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("RelativeFilename must not start with a root");
+				}
+				else if (!(fragments.Last() is FileFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("RelativeFilename must end with a file");
+				}
+				else if (fragments.Count() > 1 && !fragments.Take(fragments.Count() - 1).All(fragment => fragment is DirectoryFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("RelativeFilename must only contain directories before the filename");
+				}
+				else
+					returnVal = new RelativeFilename(string.Join("", fragments.Select(fragment => fragment.ConcatenableFragment)));
+			}
+			return returnVal;
 		}
 
 		/// <summary>

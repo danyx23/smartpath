@@ -54,6 +54,13 @@
             	as all invalid characters etc would already be rejected by the contsturctor.
             </summary>
         </member>
+        <member name="P:HTS.SmartPath.AbsoluteDirectory.PathFragments">
+            <summary>
+            Enumerates the fragments of this path. This will yield nothing for the empty path,
+            just one RootFragment (containing C:\ or \\server\share\ ) if this is a root element, and otherwise
+            one RootFragment for the root and then one DirectoryFragment for every directory.
+            </summary>
+        </member>
         <member name="M:HTS.SmartPath.AbsoluteDirectory.#ctor(System.String)">
             <summary>
             	Initializing Contstructor. Takes a string and creates an absolute directory from it.
@@ -352,6 +359,12 @@
             	The filename without the file extension (and without the dot of course).
             </summary>
         </member>
+        <member name="P:HTS.SmartPath.AbsoluteFilename.PathFragments">
+            <summary>
+            Enumerates the fragments of this path. This will yield nothing for the empty path,
+            and otherwise one RootFragment for the root and then one DirectoryFragment for every directory and finally a FileFragment
+            </summary>
+        </member>
         <member name="M:HTS.SmartPath.AbsoluteFilename.FromAbsolutePath(System.String,System.Boolean)">
             <summary>
             	Returns an AbsoluteFilename representing the given path or the Empty value if either
@@ -518,6 +531,74 @@
             </returns>
             <filterpriority>2</filterpriority>
         </member>
+        <member name="T:HTS.SmartPath.PathFragments.DirectoryFragment">
+            <summary>
+            	PathFragment that represents a directory.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragments.DirectoryFragment.ConcatenableFragment">
+            <summary>
+            	The string content of this Fragment, with a concatination character
+            	(i.e. "SomeDir\" instead of just "SomeDir")
+            </summary>
+        </member>
+        <member name="T:HTS.SmartPath.PathFragments.FileFragment">
+            <summary>
+            	PathFragment that represents a file. If this Fragment occurs it has to be a terminal node in the
+            	sequence of Fragments of a type.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragments.FileFragment.ConcatenableFragment">
+            <summary>
+            	The string content of this Fragment, with a concatination character
+            	(i.e. "SomeDir\" instead of just "SomeDir")
+            </summary>
+        </member>
+        <member name="T:HTS.SmartPath.PathFragments.IFragmentProvider">
+            <summary>
+            	This interface has just one member, an IEnumerable of Type PathFragment to 
+            	iterate over all the fragments of a path.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragments.IFragmentProvider.PathFragments">
+            <summary>
+            	Enumerable of all PathFragments of this type
+            </summary>
+        </member>
+        <member name="T:HTS.SmartPath.PathFragments.RootFragment">
+            <summary>
+            	PathFragment that represents the root path (i.e. "C:\" or "\\server\share\")
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragments.RootFragment.ConcatenableFragment">
+            <summary>
+            	The string content of this Fragment, with a concatination character
+            	(i.e. "SomeDir\" instead of just "SomeDir")
+            </summary>
+        </member>
+        <member name="T:HTS.SmartPath.PathFragment">
+            <summary>
+            	This class represents on "fragment" of a path, i.e. the drive part of a path ("C:\"),
+            	or the directory ("DirA") or the filename ("test.txt")
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragment.Fragment">
+            <summary>
+            	The string content of this Fragment, without the seperator 
+            	character (i.e. just "SomeDir" instead of "\SomeDir" or "SomeDir\"
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragment.ConcatenableFragment">
+            <summary>
+            	The string content of this Fragment, with a concatination character
+            	(i.e. "SomeDir\" instead of just "SomeDir")
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.PathFragment.IsEmpty">
+            <summary>
+            	Indicates if this Fragment is the empty string or null
+            </summary>
+        </member>
         <member name="T:HTS.SmartPath.PathInvalidException">
             <summary>
             	Exception that indicates that a path was invalid (e.g. because it contained illegal characters).
@@ -545,11 +626,6 @@
             	The name of this directory, without any separation characters or an empty string if it is the Empty value.
             </summary>
         </member>
-        <member name="P:HTS.SmartPath.RelativeDirectory.Parent">
-            <summary>
-            	The ParentDirectory of this Element or the Empty value if no parent directory was specified.
-            </summary>
-        </member>
         <member name="P:HTS.SmartPath.RelativeDirectory.IsEmpty">
             <summary>
             	Indicates if the path is Empty
@@ -566,6 +642,12 @@
             <summary>
             	Flag that indicates if this path is valid. At the moment this simply means if it is not empty,
             	as all invalid characters etc would already be rejected by the contsturctor.
+            </summary>
+        </member>
+        <member name="P:HTS.SmartPath.RelativeDirectory.PathFragments">
+            <summary>
+            Enumerates the fragments of this path. This will yield nothing for the empty path, and otherwise
+            one DirectoryFragment for every directory.
             </summary>
         </member>
         <member name="M:HTS.SmartPath.RelativeDirectory.CreateDirectoryPath(System.String)">
@@ -672,9 +754,10 @@
             	as all invalid characters etc would already be rejected by the contsturctor.
             </summary>
         </member>
-        <member name="P:HTS.SmartPath.RelativeFilename.Parent">
+        <member name="P:HTS.SmartPath.RelativeFilename.PathFragments">
             <summary>
-            	The ParentDirectory of this Element or the Empty value if no parent directory was specified.
+            Enumerates the fragments of this path. This will yield nothing for the empty path,
+            and otherwise one DirectoryFragment for every directory and finally a FileFragment
             </summary>
         </member>
         <member name="M:HTS.SmartPath.RelativeFilename.FromPathString(System.String,System.Boolean)">
@@ -722,26 +805,6 @@
             A <see cref="T:System.String"/> containing a fully qualified type name.
             </returns>
             <filterpriority>2</filterpriority>
-        </member>
-        <member name="M:HTS.SmartPath.PathUtilities.GetAncestorsAndSelf(HTS.SmartPath.AbsoluteDirectory)">
-            <summary>
-            	Enumerates all Ancestors from the root until and including this item.
-            </summary>
-        </member>
-        <member name="M:HTS.SmartPath.PathUtilities.GetAncestors(HTS.SmartPath.AbsoluteDirectory)">
-            <summary>
-            	Enumerates all Ancestors from the root until but excluding this item.
-            </summary>
-        </member>
-        <member name="M:HTS.SmartPath.PathUtilities.GetAncestorsAndSelf(HTS.SmartPath.RelativeDirectory)">
-            <summary>
-            	Enumerates all Ancestors from the root until and including this item.
-            </summary>
-        </member>
-        <member name="M:HTS.SmartPath.PathUtilities.GetAncestors(HTS.SmartPath.RelativeDirectory)">
-            <summary>
-            	Enumerates all Ancestors from the root until but excluding this item.
-            </summary>
         </member>
     </members>
 </doc>

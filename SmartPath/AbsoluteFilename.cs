@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using HTS.SmartPath.PathFragments;
 
 namespace HTS.SmartPath
 {
@@ -8,14 +11,14 @@ namespace HTS.SmartPath
 	///		windows NTFS paths starting with a drive letter (C:\test\) or SMB Shares
 	///		(\\Server\share\somedir). 
 	/// </summary>
-	public struct AbsoluteFilename : IEquatable<AbsoluteFilename>
+	public struct AbsoluteFilename : IEquatable<AbsoluteFilename>, IFragmentProvider
 	{
 		/// <summary>
 		///		Default value for this type that represents no filename.
 		/// </summary>
 		public static AbsoluteFilename Empty = new AbsoluteFilename();
 		private readonly string m_AbsolutePath;
-		private readonly string m_Filename;
+		private readonly PathFragment[] m_PathFragments;
 
 		/// <summary>
 		///		The <see cref="System.IO.FileInfo"/> for this file. Lazily initialized.
@@ -31,7 +34,7 @@ namespace HTS.SmartPath
 		/// <summary>
 		///		Filename including the file extension or an empty string if this is an Empty value.
 		/// </summary>
-		public string FilenameWithExtension { get { return m_Filename ?? ""; } }
+		public string FilenameWithExtension { get { return IsEmpty ? "" : m_PathFragments.Last().Fragment; } }
 
 		/// <summary>
 		///		The parent <see cref="AbsoluteDirectory"/>.
@@ -87,14 +90,22 @@ namespace HTS.SmartPath
 		{
 			get
 			{
-				if (m_Filename == null)
+				if (IsEmpty)
 					return "";
-				var lastIndexOfDot = m_Filename.LastIndexOf(".");
+
+				var filenameWithExtension = FilenameWithExtension;
+                var lastIndexOfDot = filenameWithExtension.LastIndexOf(".");
 				if (lastIndexOfDot >= 0)
-					return m_Filename.Substring(0, lastIndexOfDot);
-				return m_Filename;
+					return filenameWithExtension.Substring(0, lastIndexOfDot);
+				return filenameWithExtension;
 			}
 		}
+
+		/// <summary>
+		///	Enumerates the fragments of this path. This will yield nothing for the empty path,
+		/// and otherwise one RootFragment for the root and then one DirectoryFragment for every directory and finally a FileFragment
+		/// </summary>
+		public IEnumerable<PathFragment> PathFragments { get { return m_PathFragments ?? Enumerable.Empty<PathFragment>(); } }
 
 		internal AbsoluteFilename(string absolutePath)
 		{
@@ -106,13 +117,13 @@ namespace HTS.SmartPath
 				throw new PathInvalidException("No filename contained in path " + absolutePath);
 
 			m_AbsolutePath = absolutePath;
-			m_Filename = match.Groups["file"].Value;
+			m_PathFragments = PathUtilities.GetPathFragments(match, false).ToArray();
 		}
 
-		internal AbsoluteFilename(AbsoluteDirectory parent, string relativePath)
+		internal AbsoluteFilename(AbsoluteDirectory parent, RelativeFilename relativePath)
 		{
-			m_AbsolutePath = parent.AbsolutePath + relativePath;
-			m_Filename = relativePath;
+			m_AbsolutePath = parent.AbsolutePath + relativePath.FullPath;
+			m_PathFragments = parent.PathFragments.Concat(relativePath.PathFragments).ToArray();
 		}
 
 		/// <summary>
@@ -142,6 +153,33 @@ namespace HTS.SmartPath
 			
 		}
 
+		public static AbsoluteFilename FromPathFragments(IEnumerable<PathFragment> fragments, bool throwExceptionForInvalidPaths = false)
+		{
+			AbsoluteFilename returnVal = Empty;
+
+			if (fragments.Any())
+			{
+				if (!(fragments.First() is RootFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("AbsoluteFilename must start with a root");
+				}
+				else if (!(fragments.Last() is FileFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("AbsoluteFilename must end with a file");
+				}
+				else if (fragments.Count() > 2 && !fragments.Skip(1).Take(fragments.Count() - 2).All(fragment => fragment is DirectoryFragment))
+				{
+					if (throwExceptionForInvalidPaths)
+						throw new PathInvalidException("AbsoluteFilename must only contain directories in between the root and filename");
+				}
+				else
+					returnVal = new AbsoluteFilename(string.Join("", fragments.Select(fragment => fragment.ConcatenableFragment)));
+			}
+			return returnVal;
+		}
+
 		/// <summary>
 		///		Returns a new AbsoluteFilename with the given file extension. If the file extension is invalid, 
 		///		the unchanged instance is returned.
@@ -156,6 +194,20 @@ namespace HTS.SmartPath
 			}
 			else
 				return this;
+		}
+
+		public bool IsBelow(AbsoluteDirectory suspectedDirectoryAbove)
+		{
+			if (this.IsEmpty)
+				return false;
+
+			if (suspectedDirectoryAbove.IsEmpty)
+				return false;
+
+			RelativeFilename relativeFilename;
+			if (TryGetRelativePath(suspectedDirectoryAbove, out relativeFilename))
+				return PathUtilities.IsEntirePathDescendingOnly(relativeFilename);
+			return false;
 		}
 
 		/// <summary>
@@ -190,7 +242,7 @@ namespace HTS.SmartPath
 			if (IsEmpty)
 				return RelativeFilename.Empty;
 
-			return new RelativeFilename(m_Filename);
+			return new RelativeFilename(FilenameWithExtension);
 		}
 
 		/// <summary>
@@ -208,9 +260,9 @@ namespace HTS.SmartPath
 			if (!dirsShareRoot)
 				return false;
 			if (relativeDir.IsEmpty)
-				relativeFilename = new RelativeFilename(m_Filename);
+				relativeFilename = new RelativeFilename(FilenameWithExtension);
 			else
-				relativeFilename = new RelativeFilename(relativeDir, m_Filename);
+				relativeFilename = new RelativeFilename(relativeDir, FilenameWithExtension);
 			
 			return true;
 		}
